@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Vertical Images Viewer
+Exec=/app/bin/VerticalImagesViewer %U
+Icon=com.github.ymr7rvc4z7ab.VerticalImagesViewer
+Terminal=false
+Type=Application
+Actions=new-window;
+MimeType=inode/directory;image/avif;image/gif;image/heif;image/jpeg;image/jxl;image/png;image/bmp;image/x-eps;image/x-icns;image/x-ico;image/x-portable-bitmap;image/x-portable-graymap;image/x-portable-pixmap;image/x-xbitmap;image/x-xpixmap;image/tiff;image/x-psd;image/x-webp;image/webp;image/x-tga;image/x-xcf;image/openraster;image/svg+xml;image/svg+xml-compressed;application/x-krita;
+[Desktop Action new-window]
+Name=Open a New Window
+Exec=/app/bin/VerticalImagesViewer %U

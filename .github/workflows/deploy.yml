@@ -1,0 +1,84 @@
+name: Build
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+      env:
+        DOTNET_CLI_HOME: /tmp
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Source Repository
+        uses: actions/checkout@v6
+        with:
+          repository: 'ymr7rvc4z7ab/CarouselImagesViewer'
+          ref: 'main'
+          token: ${{ secrets.SOURCE_TOKEN }}
+          path: 'CarouselImagesViewer'
+
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Setup Dotnet 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.103'
+
+      - name: Setup Python 3
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Install Dependencies From Flathub
+        run: flatpak-builder build-dir --install-deps-from=flathub --download-only com.github.ymr7rvc4z7ab.CarouselImagesViewer.yml
+          
+      - name: Generate nuget-sources.json
+        run: python3 flatpak-dotnet-generator.py nuget-sources.json CarouselImagesViewer/CarouselImagesViewer.csproj
+
+      - name: Build Flatpak Repository
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: com.github.ymr7rvc4z7ab.CarouselImagesViewer.yml
+          build-bundle: true
+          gpg-sign: ${{ steps.import_gpg.outputs.keyid }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      
+      - name: Rename icon
+        run: mv com.github.ymr7rvc4z7ab.CarouselImagesViewer.svg repo/icon.svg
+
+      - name: Upload Flatpak Repository Artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: repo/
+
+  deploy:
+    needs: build
+    if: success()
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
