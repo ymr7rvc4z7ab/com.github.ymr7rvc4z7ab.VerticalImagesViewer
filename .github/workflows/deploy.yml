@@ -22,10 +22,10 @@ jobs:
       - name: Checkout Source Repository
         uses: actions/checkout@v6
         with:
-          repository: 'ymr7rvc4z7ab/CarouselImagesViewer'
+          repository: 'ymr7rvc4z7ab/VerticalImagesViewer'
           ref: 'main'
           token: ${{ secrets.SOURCE_TOKEN }}
-          path: 'CarouselImagesViewer'
+          path: 'VerticalImagesViewer'
 
       - name: Import GPG key
         id: import_gpg
@@ -45,15 +45,15 @@ jobs:
           python-version: '3.14'
 
       - name: Install Dependencies From Flathub
-        run: flatpak-builder build-dir --install-deps-from=flathub --download-only com.github.ymr7rvc4z7ab.CarouselImagesViewer.yml
+        run: flatpak-builder build-dir --install-deps-from=flathub --download-only com.github.ymr7rvc4z7ab.VerticalImagesViewer.yml
           
       - name: Generate nuget-sources.json
-        run: python3 flatpak-dotnet-generator.py nuget-sources.json CarouselImagesViewer/CarouselImagesViewer.csproj
+        run: python3 flatpak-dotnet-generator.py nuget-sources.json VerticalImagesViewer/VerticalImagesViewer.csproj
 
       - name: Build Flatpak Repository
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          manifest-path: com.github.ymr7rvc4z7ab.CarouselImagesViewer.yml
+          manifest-path: com.github.ymr7rvc4z7ab.VerticalImagesViewer.yml
           build-bundle: true
           gpg-sign: ${{ steps.import_gpg.outputs.keyid }}
         env:
@@ -61,7 +61,7 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       
       - name: Rename icon
-        run: mv com.github.ymr7rvc4z7ab.CarouselImagesViewer.svg repo/icon.svg
+        run: mv com.github.ymr7rvc4z7ab.VerticalImagesViewer.svg repo/icon.svg
 
       - name: Upload Flatpak Repository Artifact
         uses: actions/upload-pages-artifact@v4
