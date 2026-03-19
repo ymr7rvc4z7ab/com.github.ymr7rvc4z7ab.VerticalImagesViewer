@@ -1,5 +1,5 @@
 id: com.github.ymr7rvc4z7ab.VerticalImagesViewer
-version: 1.4.0
+version: 1.4.1
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
